@@ -1,4 +1,3 @@
-
 # 🚨 FAILSAFE: AI-Powered Student Risk Detection System
 
 FAILSAFE is an intelligent academic support system designed to **detect at-risk students early** using machine learning and provide **explainable insights** for timely intervention.
@@ -83,6 +82,7 @@ In traditional education systems, student failure is often identified **too late
 ---
 
 ## 📂 Project Structure
+
 failsafe/
 │
 ├── backend/
@@ -101,8 +101,6 @@ failsafe/
 ├── trained_models/
 └── README.md
 
----
-
 ## ⚙️ How It Works
 
 1. Faculty uploads student dataset  
@@ -119,7 +117,7 @@ failsafe/
 ### 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/your-username/failsafe.git
+git clone https://github.com/Subhajit-Das001/failsafe.git
 cd failsafe
 2️⃣ Backend Setup
 cd backend
@@ -149,7 +147,8 @@ Advanced deep learning models
 Student feedback loop
 🤝 Contributors
    Soumik Roy
-   Shikhar pogi
+   Shikhar Jindal
+   Subhajit Das
 📜 License
 This project is intended for educational and research purposes.
 👨‍💻 Author
