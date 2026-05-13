@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/Accuracy-90.4%25-brightgreen" alt="Accuracy" />
   <img src="https://img.shields.io/badge/ROC--AUC-0.957-blue" alt="AUC" />
   <img src="https://img.shields.io/badge/Features-18-orange" alt="Features" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow" alt="License" />
+  
 </p>
 
 ---
@@ -275,9 +275,7 @@ A test CSV with 10 students is included at `frontend/failsafe/public/sample_stud
 - [ ] Admin panel for managing faculty accounts
 - [ ] Docker Compose for one-command deployment
 
-## 📄 License
 
-This project is licensed under the MIT License.
 
 ---
 
