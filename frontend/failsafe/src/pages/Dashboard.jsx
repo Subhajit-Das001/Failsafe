@@ -464,12 +464,12 @@ function Dashboard() {
                                 <div className="form-group">
                                     <label>Student Name</label>
                                     <input type="text" required value={singleForm.name}
-                                        onChange={e => setSingleForm({ ...singleForm, name: e.target.value })} placeholder="e.g. Aarav Sharma" />
+                                        onChange={e => setSingleForm({ ...singleForm, name: e.target.value })} placeholder="e.g. Subhajit Das " />
                                 </div>
                                 <div className="form-group">
                                     <label>Roll No</label>
                                     <input type="text" required value={singleForm.roll_no}
-                                        onChange={e => setSingleForm({ ...singleForm, roll_no: e.target.value })} placeholder="e.g. CS2024001" />
+                                        onChange={e => setSingleForm({ ...singleForm, roll_no: e.target.value })} placeholder="e.g. 240107087" />
                                 </div>
                             </div>
                             <div className="form-row">
@@ -515,8 +515,8 @@ function Dashboard() {
                                         onChange={e => setSingleForm({ ...singleForm, social_activity: e.target.value })} />
                                 </div>
                                 <div className="form-group">
-                                    <label>Alcohol (1-5)</label>
-                                    <input type="number" min="1" max="5" step="0.5" value={singleForm.alcohol_consumption}
+                                    <label>Alcohol (0-5)</label>
+                                    <input type="number" min="0" max="5" step="0.5" value={singleForm.alcohol_consumption}
                                         onChange={e => setSingleForm({ ...singleForm, alcohol_consumption: e.target.value })} />
                                 </div>
                             </div>
