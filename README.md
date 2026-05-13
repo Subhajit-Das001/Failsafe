@@ -216,7 +216,7 @@ npm run dev
 
 ```json
 {
-  "student": { "name": "Aarav Sharma", "roll_no": "CS2024001" },
+  "student": { "name": "Subhajit Das", "roll_no": "240107087" },
   "prediction": {
     "risk_level": "high",
     "risk_probability": 0.9833,
