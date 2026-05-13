@@ -1,0 +1,465 @@
+/* ================================
+   ABOUT PAGE STYLES
+   ================================ */
+
+.about {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Hero Banner */
+.about-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 100px 50px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.about-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.about-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -50%;
+    right: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.about-hero-content {
+    max-width: 720px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.about-tag {
+    display: inline-block;
+    background: rgba(99, 102, 241, 0.15);
+    color: #a5b4fc;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+}
+
+.about-hero h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.2;
+    margin: 0 0 20px 0;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #818cf8, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.about-hero p {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* Sections */
+.about-section {
+    padding: 80px 50px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.about-section.dark {
+    background: #fafafe;
+    max-width: 100%;
+    padding: 80px 50px;
+}
+
+.about-section.alt {
+    background: #fff;
+}
+
+.section-center {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 48px;
+}
+
+.about-label {
+    display: inline-block;
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    padding: 4px 14px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 12px;
+}
+
+.about-label.light {
+    background: rgba(99, 102, 241, 0.08);
+    color: #818cf8;
+}
+
+.about-section h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin: 0 0 12px 0;
+    line-height: 1.2;
+}
+
+.section-desc {
+    font-size: 1rem;
+    color: #777;
+    line-height: 1.6;
+}
+
+/* About Grid (text + visual) */
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.about-grid.reverse {
+    direction: rtl;
+}
+
+.about-grid.reverse > * {
+    direction: ltr;
+}
+
+.about-text .about-label {
+    display: inline-block;
+}
+
+.about-text h2 {
+    font-size: 1.8rem;
+}
+
+.about-text p {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.7;
+    margin: 0 0 14px 0;
+}
+
+/* Visual Cards */
+.visual-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+}
+
+.mission-card {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.mission-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+}
+
+.big-number {
+    font-size: 2.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+}
+
+.stat-desc {
+    font-size: 0.9rem;
+    color: #777;
+    font-weight: 500;
+}
+
+/* Pipeline Grid */
+.pipeline-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.pipeline-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 14px;
+    padding: 28px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.pipeline-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+.pipeline-step {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #a5b4fc;
+    background: rgba(99, 102, 241, 0.08);
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+}
+
+.pipeline-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 10px 0;
+}
+
+.pipeline-card p {
+    font-size: 0.88rem;
+    color: #777;
+    line-height: 1.6;
+    margin: 0 0 16px 0;
+}
+
+.pipeline-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.pipeline-tags span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6366f1;
+    background: rgba(99, 102, 241, 0.08);
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+}
+
+/* Tech Grid */
+.tech-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.tech-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 14px;
+    padding: 28px 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.tech-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+.tech-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.tech-card h4 {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 4px 0;
+}
+
+.tech-card p {
+    font-size: 0.75rem;
+    color: #999;
+    margin: 0;
+}
+
+/* Dataset Card */
+.dataset-card {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: none;
+    color: #fff;
+}
+
+.dataset-card h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #a5b4fc;
+    margin: 0 0 20px 0;
+    letter-spacing: 0.3px;
+}
+
+.dataset-stats {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.ds-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.ds-val {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+}
+
+.ds-label {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.dataset-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.dataset-features span {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.08);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+}
+
+.dataset-link {
+    display: inline-block;
+    color: #6366f1;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    margin-top: 6px;
+    transition: color 0.2s ease;
+}
+
+.dataset-link:hover {
+    color: #8b5cf6;
+}
+
+/* CTA Section */
+.about-cta {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 80px 50px;
+    text-align: center;
+}
+
+.about-cta h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 12px 0;
+}
+
+.about-cta p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 32px 0;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.about-cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .pipeline-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tech-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .about-hero {
+        padding: 80px 24px 60px;
+    }
+
+    .about-hero h1 {
+        font-size: 2rem;
+    }
+
+    .about-section {
+        padding: 60px 24px;
+    }
+
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .about-grid.reverse {
+        direction: ltr;
+    }
+
+    .pipeline-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tech-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .about-cta {
+        padding: 60px 24px;
+    }
+
+    .about-cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}

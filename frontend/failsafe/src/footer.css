@@ -1,0 +1,20 @@
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 40px 50px;
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+}
+.footer-container h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: #ffffff;
+    font-size: 16px;
+}
+.footer-container p {
+    margin: 6px 0;
+    font-size: 14px;
+    color: #b0b0b0;
+}

@@ -1,0 +1,92 @@
+body{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box; 
+    font-family: 'Poppins', sans-serif;
+}
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 50px;
+    background-color: #1a1a2e;
+    height: 72px;
+}   
+.navbar-container .logo {
+    display: flex;
+    align-items: center;
+}
+.navbar-container .logo img {
+    height: 68px;
+    width: auto;
+    object-fit: contain;
+}   
+.navbar-container .nav-links {
+    display: flex;
+    align-items:flex-start;
+}
+.navbar-container .nav-links ul {
+    display: flex;
+    list-style: none;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+}
+.navbar-container .nav-links a {
+    text-decoration: none;
+    color: #e0e0e0;
+    font-weight: 800;
+    transition: color 0.2s ease;
+}
+.navbar-container .nav-links a:hover {
+    color: #ffffff;
+}
+.navbar-container .sign-in {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.signin-btn {
+    text-decoration: none;
+    color: #fff;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 12px rgba(99, 102, 241, 0.3);
+}
+.signin-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 20px rgba(99, 102, 241, 0.45);
+}
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.user-name {
+    color: #e0e0e0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.logout-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #f87171;
+}       
