@@ -224,68 +224,33 @@ def _fallback_importance(features, feature_cols):
 def predict_batch(students_df: pd.DataFrame) -> List[Dict]:
     """
     Predict risk for a batch of students from a DataFrame.
-
-    Args:
-        students_df: DataFrame with student data.
-
-    Returns:
-        List of prediction dicts for each student.
+    Uses fuzzy column matching to handle varied CSV formats.
     """
     model, explainer, feature_cols = get_model()
 
-    # Map common CSV column names to model features
-    column_mapping = {
-        "attendance": "attendance_pct",
-        "attendance_rate": "attendance_pct",
-        "attendance_pct": "attendance_pct",
-        "attendance_percentage": "attendance_pct",
-        "assignment": "assignment_score",
-        "assignments": "assignment_score",
-        "assignment_score": "assignment_score",
-        "assignment_avg": "assignment_score",
-        "grades": "assignment_score",
-        "study_hours": "study_hours",
-        "studytime": "study_hours",
-        "failures": "past_failures",
-        "past_failures": "past_failures",
-        "health": "health_status",
-        "health_status": "health_status",
-        "family_support": "family_support",
-        "famrel": "family_support",
-        "social_activity": "social_activity",
-        "goout": "social_activity",
-        "free_time": "free_time",
-        "freetime": "free_time",
-        "alcohol": "alcohol_consumption",
-        "alcohol_consumption": "alcohol_consumption",
-        # New feature mappings
-        "age": "age",
-        "parent_education": "parent_education",
-        "parent_edu": "parent_education",
-        "travel_time": "travel_time",
-        "traveltime": "travel_time",
-        "school_support": "extra_school_support",
-        "extra_school_support": "extra_school_support",
-        "schoolsup": "extra_school_support",
-        "family_edu_support": "extra_family_support",
-        "extra_family_support": "extra_family_support",
-        "famsup": "extra_family_support",
-        "higher": "wants_higher_ed",
-        "wants_higher_ed": "wants_higher_ed",
-        "internet": "internet_access",
-        "internet_access": "internet_access",
-        "romantic": "in_relationship",
-        "in_relationship": "in_relationship",
-        "activities": "extra_activities",
-        "extra_activities": "extra_activities",
-    }
+    # Clean column names: strip whitespace, lowercase
+    students_df.columns = [c.strip() for c in students_df.columns]
 
-    # Rename columns
-    renamed = students_df.rename(columns={
-        col: column_mapping[col.lower().strip()]
-        for col in students_df.columns
-        if col.lower().strip() in column_mapping
-    })
+    # Smart column mapping using keyword matching
+    mapped_columns = _smart_column_map(students_df.columns.tolist())
+
+    # Rename columns using the smart mapping
+    renamed = students_df.rename(columns=mapped_columns)
+
+    # Log mapping results for debugging
+    mapped_features = [v for v in mapped_columns.values() if v in FEATURE_DEFAULTS]
+    print(f"Column mapping: {len(mapped_columns)} mapped out of {len(students_df.columns)} CSV columns")
+    print(f"  Feature columns found: {mapped_features}")
+    unmapped = [c for c in students_df.columns if c not in mapped_columns]
+    if unmapped:
+        print(f"  Unmapped columns (using defaults): {unmapped}")
+
+    # Validate critical columns exist
+    has_attendance = "attendance_pct" in renamed.columns
+    has_marks = "assignment_score" in renamed.columns
+    if not has_attendance and not has_marks:
+        print(f"  ⚠️ WARNING: Neither attendance nor marks column found!")
+        print(f"  CSV columns: {list(students_df.columns)}")
 
     results = []
     for idx, row in renamed.iterrows():
@@ -293,10 +258,12 @@ def predict_batch(students_df: pd.DataFrame) -> List[Dict]:
 
         # Preserve identity columns
         identity = {}
-        for col in ["name", "student_name", "roll", "roll_no", "roll_number",
-                     "id", "student_id", "email"]:
-            if col in students_df.columns:
-                identity[col] = str(students_df.loc[idx, col])
+        for col in students_df.columns:
+            cl = col.lower().strip()
+            if any(k in cl for k in ["name", "roll", "id", "email", "student"]):
+                if col in mapped_columns and mapped_columns[col] in FEATURE_DEFAULTS:
+                    continue  # This is a feature column, not identity
+                identity[cl.replace(" ", "_")] = str(students_df.loc[idx, col])
 
         try:
             prediction = predict_single(student_data)
@@ -311,6 +278,104 @@ def predict_batch(students_df: pd.DataFrame) -> List[Dict]:
             })
 
     return results
+
+
+def _smart_column_map(csv_columns: List[str]) -> Dict[str, str]:
+    """
+    Fuzzy-match CSV column names to model feature names using keyword matching.
+    Handles headers like 'Attendance %', 'Marks', 'Total Score', 'Study Time', etc.
+    """
+    # Keyword rules: (list of keywords to match, target feature name)
+    # More specific rules first to avoid false matches
+    keyword_rules = [
+        # Attendance
+        (["attendance"], "attendance_pct"),
+        # Assignment / Marks / Score / Grade
+        (["assignment"], "assignment_score"),
+        (["mark"], "assignment_score"),
+        (["score"], "assignment_score"),
+        (["grade"], "assignment_score"),
+        # Study hours
+        (["study"], "study_hours"),
+        # Past failures
+        (["failure"], "past_failures"),
+        (["fail"], "past_failures"),
+        # Health
+        (["health"], "health_status"),
+        # Family support (not family_edu or famsup)
+        (["family_support"], "family_support"),
+        (["famrel"], "family_support"),
+        (["family_rel"], "family_support"),
+        # Social / going out
+        (["social"], "social_activity"),
+        (["goout"], "social_activity"),
+        (["going_out"], "social_activity"),
+        # Free time
+        (["free_time"], "free_time"),
+        (["freetime"], "free_time"),
+        (["leisure"], "free_time"),
+        # Alcohol
+        (["alcohol"], "alcohol_consumption"),
+        (["drink"], "alcohol_consumption"),
+        # Age
+        (["age"], "age"),
+        # Parent education
+        (["parent_edu"], "parent_education"),
+        (["parent_education"], "parent_education"),
+        (["medu"], "parent_education"),
+        # Travel
+        (["travel"], "travel_time"),
+        (["commute"], "travel_time"),
+        # Extra school support
+        (["school_support"], "extra_school_support"),
+        (["schoolsup"], "extra_school_support"),
+        (["extra_school"], "extra_school_support"),
+        # Family edu support
+        (["famsup"], "extra_family_support"),
+        (["family_edu"], "extra_family_support"),
+        # Higher education
+        (["higher"], "wants_higher_ed"),
+        (["higher_ed"], "wants_higher_ed"),
+        # Internet
+        (["internet"], "internet_access"),
+        # Relationship
+        (["romantic"], "in_relationship"),
+        (["relationship"], "in_relationship"),
+        # Activities
+        (["activit"], "extra_activities"),
+        (["extracurricular"], "extra_activities"),
+    ]
+
+    # Identity columns to skip (don't map these to features)
+    identity_keywords = ["name", "roll", "student_id", "email", "enrol", "reg"]
+
+    mapping = {}
+    used_targets = set()
+
+    for col in csv_columns:
+        cleaned = col.lower().strip().replace(" ", "_").replace("%", "").replace("-", "_")
+
+        # Skip identity columns
+        if any(k in cleaned for k in identity_keywords):
+            continue
+
+        # Try direct match first (exact feature name)
+        if cleaned in FEATURE_DEFAULTS:
+            if cleaned not in used_targets:
+                mapping[col] = cleaned
+                used_targets.add(cleaned)
+                continue
+
+        # Try keyword matching
+        for keywords, target in keyword_rules:
+            if target in used_targets:
+                continue
+            if any(kw in cleaned for kw in keywords):
+                mapping[col] = target
+                used_targets.add(target)
+                break
+
+    return mapping
 
 
 def _format_feature_name(key: str) -> str:
