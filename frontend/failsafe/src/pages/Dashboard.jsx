@@ -63,18 +63,29 @@ function Dashboard() {
             const data = await res.json();
 
             // Transform batch results into dashboard-friendly format
-            const newStudents = data.predictions.map((pred, idx) => ({
-                id: idx + 1,
-                name: pred.student_info?.name || pred.student_info?.student_name || `Student ${idx + 1}`,
-                roll: pred.student_info?.roll || pred.student_info?.roll_no || `#${idx + 1}`,
-                attendance: pred.shap_explanations?.find(s => s.feature_key === "attendance_pct")?.value ?? 0,
-                assignments: pred.shap_explanations?.find(s => s.feature_key === "assignment_score")?.value ?? 0,
-                study_hours: pred.shap_explanations?.find(s => s.feature_key === "study_hours")?.value ?? 0,
-                risk_level: pred.risk_level,
-                risk_probability: pred.risk_probability,
-                shap_explanations: pred.shap_explanations || [],
-                intervention: pred.intervention || null,
-            }));
+            // Filter out any predictions that had errors
+            const newStudents = data.predictions
+                .filter(pred => !pred.error)
+                .map((pred, idx) => {
+                    // Extract attendance and assignment values from SHAP or student_info
+                    const allShap = pred.shap_explanations || [];
+                    const attendance = allShap.find(s => s.feature_key === "attendance_pct")?.value ?? 0;
+                    const assignments = allShap.find(s => s.feature_key === "assignment_score")?.value ?? 0;
+
+                    return {
+                        id: idx + 1,
+                        name: pred.student_info?.name || pred.student_info?.student_name || `Student ${idx + 1}`,
+                        roll: pred.student_info?.roll || pred.student_info?.roll_no || `#${idx + 1}`,
+                        attendance,
+                        assignments,
+                        study_hours: allShap.find(s => s.feature_key === "study_hours")?.value ?? 0,
+                        risk_level: pred.risk_level || "low",
+                        risk_probability: pred.risk_probability ?? 0,
+                        risk_reasons: pred.risk_reasons || [],
+                        shap_explanations: allShap,
+                        intervention: pred.intervention || null,
+                    };
+                });
 
             setStudents(newStudents);
             setUploadStatus("done");
@@ -283,12 +294,12 @@ function Dashboard() {
                                             </div>
                                         </td>
                                         <td>
-                                            <span className={`risk-badge ${student.risk_level}`} style={{ color: getRiskColor(student.risk_level) }}>
-                                                {student.risk_level.charAt(0).toUpperCase() + student.risk_level.slice(1)}
+                                            <span className={`risk-badge ${student.risk_level || 'low'}`} style={{ color: getRiskColor(student.risk_level || 'low') }}>
+                                                {(student.risk_level || 'low').charAt(0).toUpperCase() + (student.risk_level || 'low').slice(1)}
                                             </span>
                                         </td>
                                         <td>
-                                            <span className="probability-val">{(student.risk_probability * 100).toFixed(1)}%</span>
+                                            <span className="probability-val">{((student.risk_probability || 0) * 100).toFixed(1)}%</span>
                                         </td>
                                         <td>
                                             <button className="view-btn" onClick={() => setSelectedStudent(student)}>
@@ -354,8 +365,8 @@ function Dashboard() {
                                 <h2>{selectedStudent.name}</h2>
                                 <span className="modal-roll">{selectedStudent.roll}</span>
                             </div>
-                            <span className={`risk-badge large ${selectedStudent.risk_level}`} style={{ color: getRiskColor(selectedStudent.risk_level) }}>
-                                {selectedStudent.risk_level.toUpperCase()} RISK ({(selectedStudent.risk_probability * 100).toFixed(1)}%)
+                            <span className={`risk-badge large ${selectedStudent.risk_level || 'low'}`} style={{ color: getRiskColor(selectedStudent.risk_level || 'low') }}>
+                                {(selectedStudent.risk_level || 'low').toUpperCase()} RISK ({((selectedStudent.risk_probability || 0) * 100).toFixed(1)}%)
                             </span>
                         </div>
 
