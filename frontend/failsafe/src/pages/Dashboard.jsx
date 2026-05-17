@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import "./Dashboard.css";
 
@@ -9,6 +9,7 @@ function Dashboard() {
     const [students, setStudents] = useState([]);
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [filterRisk, setFilterRisk] = useState("all");
+    const [visibleCount, setVisibleCount] = useState(50);
     const [uploadStatus, setUploadStatus] = useState(null);
     const [uploadError, setUploadError] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
@@ -23,17 +24,21 @@ function Dashboard() {
     });
     const [singleLoading, setSingleLoading] = useState(false);
 
-    const filtered = filterRisk === "all"
-        ? students
-        : students.filter(s => s.risk_level === filterRisk);
+    const filtered = useMemo(() => {
+        return filterRisk === "all"
+            ? students
+            : students.filter(s => s.risk_level === filterRisk);
+    }, [students, filterRisk]);
 
-    const stats = {
-        total: students.length,
-        high: students.filter(s => s.risk_level === "high").length,
-        medium: students.filter(s => s.risk_level === "medium").length,
-        low: students.filter(s => s.risk_level === "low").length,
-        interventions: students.filter(s => s.intervention && s.intervention.targeted_interventions?.length > 0).length,
-    };
+    const stats = useMemo(() => {
+        return {
+            total: students.length,
+            high: students.filter(s => s.risk_level === "high").length,
+            medium: students.filter(s => s.risk_level === "medium").length,
+            low: students.filter(s => s.risk_level === "low").length,
+            interventions: students.filter(s => s.intervention && s.intervention.targeted_interventions?.length > 0).length,
+        };
+    }, [students]);
 
     // --- Batch Upload ---
     async function handleUpload(e) {
@@ -253,10 +258,10 @@ function Dashboard() {
                     <div className="section-header">
                         <h3>Student Risk Assessment</h3>
                         <div className="filter-group">
-                            <button className={`filter-btn ${filterRisk === "all" ? "active" : ""}`} onClick={() => setFilterRisk("all")}>All ({stats.total})</button>
-                            <button className={`filter-btn ${filterRisk === "high" ? "active" : ""}`} onClick={() => setFilterRisk("high")}>High ({stats.high})</button>
-                            <button className={`filter-btn ${filterRisk === "medium" ? "active" : ""}`} onClick={() => setFilterRisk("medium")}>Medium ({stats.medium})</button>
-                            <button className={`filter-btn ${filterRisk === "low" ? "active" : ""}`} onClick={() => setFilterRisk("low")}>Low ({stats.low})</button>
+                            <button className={`filter-btn ${filterRisk === "all" ? "active" : ""}`} onClick={() => { setFilterRisk("all"); setVisibleCount(50); }}>All ({stats.total})</button>
+                            <button className={`filter-btn ${filterRisk === "high" ? "active" : ""}`} onClick={() => { setFilterRisk("high"); setVisibleCount(50); }}>High ({stats.high})</button>
+                            <button className={`filter-btn ${filterRisk === "medium" ? "active" : ""}`} onClick={() => { setFilterRisk("medium"); setVisibleCount(50); }}>Medium ({stats.medium})</button>
+                            <button className={`filter-btn ${filterRisk === "low" ? "active" : ""}`} onClick={() => { setFilterRisk("low"); setVisibleCount(50); }}>Low ({stats.low})</button>
                         </div>
                     </div>
                     <div className="table-wrapper">
@@ -273,7 +278,7 @@ function Dashboard() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filtered.map(student => (
+                                {filtered.slice(0, visibleCount).map(student => (
                                     <tr key={student.id}>
                                         <td className="student-name-cell">{student.name}</td>
                                         <td className="roll-cell">{student.roll}</td>
@@ -311,6 +316,13 @@ function Dashboard() {
                             </tbody>
                         </table>
                     </div>
+                    {filtered.length > visibleCount && (
+                        <div className="load-more-container" style={{ textAlign: "center", marginTop: "15px", marginBottom: "10px" }}>
+                            <button className="view-btn" onClick={() => setVisibleCount(prev => prev + 50)}>
+                                Load More ({filtered.length - visibleCount} remaining)
+                            </button>
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div className="empty-state">

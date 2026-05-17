@@ -225,6 +225,7 @@ def predict_batch(students_df: pd.DataFrame) -> List[Dict]:
     """
     Predict risk for a batch of students from a DataFrame.
     Uses fuzzy column matching to handle varied CSV formats.
+    Optimized to use vectorized batched predictions instead of row-by-row iteration.
     """
     model, explainer, feature_cols = get_model()
 
@@ -252,9 +253,23 @@ def predict_batch(students_df: pd.DataFrame) -> List[Dict]:
         print(f"  ⚠️ WARNING: Neither attendance nor marks column found!")
         print(f"  CSV columns: {list(students_df.columns)}")
 
-    results = []
+    # Extract all identities and features into lists for batched processing
+    feature_rows = []
+    identities = []
+    valid_indices = []
+
     for idx, row in renamed.iterrows():
         student_data = row.to_dict()
+
+        # Build features
+        features = {}
+        for col in feature_cols:
+            val = student_data.get(col)
+            if val is not None and not (isinstance(val, float) and np.isnan(val)):
+                features[col] = float(val)
+            else:
+                features[col] = FEATURE_DEFAULTS.get(col, 0)
+        feature_rows.append(features)
 
         # Preserve identity columns
         identity = {}
@@ -264,18 +279,96 @@ def predict_batch(students_df: pd.DataFrame) -> List[Dict]:
                 if col in mapped_columns and mapped_columns[col] in FEATURE_DEFAULTS:
                     continue  # This is a feature column, not identity
                 identity[cl.replace(" ", "_")] = str(students_df.loc[idx, col])
+        identities.append(identity)
+        valid_indices.append(int(idx))
 
+    if not feature_rows:
+        return []
+
+    # Batch Predict
+    X_batch = pd.DataFrame(feature_rows, columns=feature_cols)
+    try:
+        ml_probs = model.predict_proba(X_batch)[:, 1]
+    except Exception as e:
+        # If batch predict fails, fallback to error objects
+        return [{"student_info": identities[i], "row_index": valid_indices[i], "error": str(e)} for i in range(len(feature_rows))]
+
+    # Batch SHAP
+    shap_values_batch = None
+    if explainer is not None:
         try:
-            prediction = predict_single(student_data)
-            prediction["student_info"] = identity
-            prediction["row_index"] = int(idx)
-            results.append(prediction)
-        except Exception as e:
-            results.append({
-                "student_info": identity,
-                "row_index": int(idx),
-                "error": str(e),
-            })
+            shap_values = explainer.shap_values(X_batch)
+            if isinstance(shap_values, list):
+                shap_values_batch = shap_values[1]
+            else:
+                shap_values_batch = shap_values
+        except Exception:
+            shap_values_batch = None
+
+    results = []
+    for i in range(len(feature_rows)):
+        ml_prob = float(ml_probs[i])
+        features = feature_rows[i]
+
+        # ---- Rule-based risk boost ----
+        attendance = features.get("attendance_pct", 75)
+        assignments = features.get("assignment_score", 60)
+
+        rule_boost = 0.0
+        risk_reasons = []
+
+        if attendance < 50:
+            rule_boost += 0.45
+            risk_reasons.append(f"Very low attendance ({attendance:.0f}%)")
+        elif attendance < 75:
+            rule_boost += 0.25
+            risk_reasons.append(f"Low attendance ({attendance:.0f}%)")
+
+        if assignments < 40:
+            rule_boost += 0.45
+            risk_reasons.append(f"Very low marks ({assignments:.0f}%)")
+        elif assignments < 60:
+            rule_boost += 0.25
+            risk_reasons.append(f"Low marks ({assignments:.0f}%)")
+
+        risk_prob = min(ml_prob + rule_boost, 1.0)
+
+        if risk_prob >= 0.7:
+            risk_level = "high"
+        elif risk_prob >= 0.4:
+            risk_level = "medium"
+        else:
+            risk_level = "low"
+
+        # SHAP explanation
+        shap_explanations = []
+        if shap_values_batch is not None:
+            sv = shap_values_batch[i]
+            for col, val in zip(feature_cols, sv):
+                shap_explanations.append({
+                    "feature": _format_feature_name(col),
+                    "feature_key": col,
+                    "value": float(features[col]),
+                    "shap_value": float(val),
+                    "impact": round(float(val), 4),
+                    "direction": "negative" if val > 0 else "positive",
+                })
+        else:
+            shap_explanations = _fallback_importance(features, feature_cols)
+
+        shap_explanations.sort(key=lambda x: abs(x.get("shap_value", x.get("impact", 0))), reverse=True)
+        shap_explanations = shap_explanations[:6]
+
+        results.append({
+            "risk_level": risk_level,
+            "risk_probability": round(risk_prob, 4),
+            "ml_probability": round(ml_prob, 4),
+            "risk_prediction": 1 if risk_prob >= 0.5 else 0,
+            "risk_reasons": risk_reasons,
+            "shap_explanations": shap_explanations,
+            "student_info": identities[i],
+            "row_index": valid_indices[i],
+        })
 
     return results
 
